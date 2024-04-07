@@ -2,10 +2,9 @@ import math
 
 """
 Lets introduce the concepts of:
-- backpropagation
 - sigmoid as activation function as we cannot have binary output but we need a constrained result between 0...1
-- cross entryp loss for loss function (to be used for below)
-- gradient descent for optimal way in which to update the bias and the weights
+- matrixes for multiple neurons and layers
+- how to deal with transpose with arrays (although not in the most scaleable of ways should use zip(*arr) or np.array.T)
 """
 
 
@@ -22,10 +21,6 @@ def dot_sum(vector_a, vector_b):
     for x, y in zip(vector_a, vector_b):
         sum += x * y
     return sum
-
-
-def cross_entropy(x):
-    pass
 
 
 def forward_pass_neuron(input_vector, neuron_weights, layer_bias):
@@ -56,7 +51,6 @@ class MultiLayerPerceptron:
 
     def forward_pass(self, input_vector):
         hidden_layer_activation = []
-        hidden_layer_output =[]
         for neuron_weights, neuron_bias in zip(
             self.w_input_to_hidden, self.bias_hidden
         ):
