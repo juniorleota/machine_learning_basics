@@ -55,7 +55,7 @@ class Perceptron:
     def __init__(self, learning_rate=0.01, epoch=100):
         self.input_2_hidden_w = [[0, 0], [0, 0]]
         self.hidden_bias = [0, 0]
-        self.hidden_2_output = [0, 0]
+        self.hidden_2_output_w = [0, 0]
         self.ouput_bias = 0
         self.learning_rate = learning_rate
         self.epoch = epoch
@@ -67,7 +67,8 @@ class Perceptron:
         hidden_layer_activation = [sigmoid(output) for output in hidden_layer_output]
         # no need to transpose since there is only one ouput neuron
         output_layer_output = (
-            vector_mult(self.hidden_2_output, hidden_layer_activation) + self.ouput_bias
+            vector_mult(self.hidden_2_output_w, hidden_layer_activation)
+            + self.ouput_bias
         )
         output_layer_activation = sigmoid(output_layer_output)
         return {
@@ -82,24 +83,67 @@ class Perceptron:
             total_loss = 0
             for input_vector, expected_output in zip(training_data, labels):
                 forward_pass_res = self.forward_pass(input_vector)
+                # print(forward_pass_res)
                 output_activation = forward_pass_res["output_layer_activation"]
-                output_loss = cross_entropy_loss(output_activation, expected_output)
-                output_sigmoid_derv = sigmoid_derivative(forward_pass_res["output_layer_output"])
-                output_layer_error_gradient = (expected_output - output_activation) *  output_sigmoid_derv
-                hidden_sigmoid_dervs = [sigmoid_derivative(x) for x in forward_pass_res["hidden_layer_output"]] 
-                hidden_layer_error_gradient = [weight * output_loss * derv for weight, derv in zip(self.hidden_2_output, hidden_sigmoid_dervs)]  
-                print(f"ouput_layer_gradient: {output_layer_error_gradient}")
-                print(f"hidden_layer_gradient: {hidden_layer_error_gradient}")
+                hidden_activation = forward_pass_res["hidden_layer_activation"]
 
+                output_loss = cross_entropy_loss(output_activation, expected_output)
+                output_sigmoid_derv = sigmoid_derivative(
+                    forward_pass_res["output_layer_output"]
+                )
+                output_err = (expected_output - output_activation) * output_sigmoid_derv
+                hidden_2_output_err_gradient = [
+                    nrn_activation * output_err for nrn_activation in hidden_activation
+                ]
+                output_bias_err_gradient = output_err
+
+                hidden_sigmoid_dervs = [
+                    sigmoid_derivative(x)
+                    for x in forward_pass_res["hidden_layer_output"]
+                ]
+                hidden_err_propagated = [
+                    weight * output_loss * derv
+                    for weight, derv in zip(
+                        self.hidden_2_output_w, hidden_sigmoid_dervs
+                    )
+                ]
+                input_2_hidden_err_gradient = [
+                    input * hidden_err
+                    for input, hidden_err in zip(input_vector, hidden_err_propagated)
+                ]
+                hidden_bias_err_gradient = hidden_err_propagated
+
+                # Update weights
+                self.hidden_2_ouput_w = [
+                    nrn_weight - (self.learning_rate * err_grad)
+                    for nrn_weight, err_grad in zip(
+                        self.hidden_2_output_w, hidden_2_output_err_gradient
+                    )
+                ]
+                self.ouput_bias -= self.learning_rate * output_bias_err_gradient
+                new_input_2_hidden_w = []
+                for row in self.input_2_hidden_w:
+                    new_row = [weight - (self.learning_rate * err) for weight, err in zip(row, input_2_hidden_err_gradient)]
+                    new_input_2_hidden_w.append(new_row)
+                self.input_2_hidden_w = new_input_2_hidden_w
+                self.hidden_bias = [
+                    bias - (self.learning_rate * bias_err_grd)
+                    for bias, bias_err_grd in zip(
+                        self.hidden_bias, hidden_bias_err_gradient
+                    )
+                ]
                 total_loss += output_loss
-            print(f"Output_loss: {output_loss/self.epoch} for iteration {iter}")
+            epoch_loss = output_loss/self.epoch
+            print(f"Output_loss: {epoch_loss} for iteration {iter}")
 
 
 if __name__ == "__main__":
     training_data = [[0, 0], [1, 1], [0, 1], [1, 0]]
     labels = [1, 1, 0, 0]
-    p = Perceptron(epoch=2)
+    p = Perceptron(epoch=10000, learning_rate=0.1)
     p.train(training_data, labels)
-    print(p.forward_pass([0, 0]))
+    for input in training_data:
+        output = p.forward_pass(input)["ouput_layer_activation"]
+        print(f"{input} XOR = {output}")
     # print(neurons_mult(mat, vec, bias))
     # print(cross_entropy_loss(1000, 0))
