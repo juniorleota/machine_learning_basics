@@ -12,10 +12,6 @@ def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
 
-def sigmoid_derivative(x):
-    return sigmoid(x) * (1 - sigmoid(x))
-
-
 def dot_sum(vector_a, vector_b):
     sum = 0
     for x, y in zip(vector_a, vector_b):
