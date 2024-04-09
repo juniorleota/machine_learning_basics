@@ -1,8 +1,12 @@
 import math
 
 '''
-So this implementation doesn't work but I left it here to hightligh how initializing everything to zero will lead to symmetry issue
-There is another bug with transpose function not being called in forward pass
+There are a few issues with this that is worth keeping to learn from:
+- initializing all weights to zero leads to something called the symetry problem where each neuron are not specialized and focus on different features
+- transpose function not being called in forward pass
+- input_2_hidden matrix is misunderstood:
+    - a row represents a neuron at the hidden layer i.e. all the connections from previous layer to current neuron
+    - a col represents a neuron at the input laylr i.e. all connections from one neuron from previous layer to current layer
 '''
 
 def sigmoid(x):

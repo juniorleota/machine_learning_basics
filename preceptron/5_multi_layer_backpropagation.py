@@ -98,13 +98,16 @@ class Perceptron:
                 hidden_activation = forward_pass_res["hidden_layer_activation"]
 
                 output_loss = cross_entropy_loss(output_activation, expected_output)
-                # print(f"Ouput Loss: {output_loss}")
+                print(f"Ouput Loss: {output_loss}")
+                output_err = (expected_output - output_activation) 
+                print(f"Ouput Error: {output_err}")
                 output_sigmoid_derv = sigmoid_derivative(
                     forward_pass_res["output_layer_output"]
                 )
-                output_err = (expected_output - output_activation) * output_sigmoid_derv
-                hidden_2_output_err_gradient = [
-                    nrn_activation * output_err for nrn_activation in hidden_activation
+                trans_hidden_w = transpose_matrix(self.input_2_hidden_w)
+                for hidden_nrn_weights in trans_hidden_w
+                    
+                hidden_layer_err = [
                 ]
                 output_bias_err_gradient = output_err
 
@@ -128,7 +131,7 @@ class Perceptron:
                 self.hidden_2_output_w = [
                     nrn_weight - (self.learning_rate * err_grad)
                     for nrn_weight, err_grad in zip(
-                        self.hidden_2_output_w, hidden_2_output_err_gradient
+                        self.hidden_2_output_w, hidden_layer_err
                     )
                 ]
                 self.output_bias -= self.learning_rate * output_bias_err_gradient
@@ -146,7 +149,7 @@ class Perceptron:
                 total_loss += output_loss
             epoch_loss = total_loss/len(training_data)
             print(f"Output_loss: {epoch_loss} ")
-            print(f"updated values: hidden_weights: {self.input_2_hidden_w}\nhidden_bias: {self.hidden_bias}\noutput_weights: {self.hidden_2_output_w}\noutput_bias: {self.output_bias}\n")
+            print(f"updated values:\nhidden_weights: {self.input_2_hidden_w}\nhidden_bias: {self.hidden_bias}\noutput_weights: {self.hidden_2_output_w}\noutput_bias: {self.output_bias}\n")
 
 def full_training():
     training_data = [[0, 0], [1, 1], [0, 1], [1, 0]]
