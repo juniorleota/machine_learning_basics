@@ -2,6 +2,7 @@ import math
 
 '''
 So this implementation doesn't work but I left it here to hightligh how initializing everything to zero will lead to symmetry issue
+There is another bug with transpose function not being called in forward pass
 '''
 
 def sigmoid(x):

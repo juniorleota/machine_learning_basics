@@ -25,7 +25,7 @@ def cross_entropy_loss(predicted_output, expected_output):
     predicted_output_clipped = min(predicted_output, 1 - epsilon)
     # this ensures that pred_output is never 0
     predicted_output_clipped = max(predicted_output_clipped, epsilon)
-    return -(
+    return -1 * (
         expected_output * math.log(predicted_output_clipped)
         + (1 - expected_output) * math.log(1 - predicted_output_clipped)
     )
@@ -38,15 +38,16 @@ def vector_add(vector_a, vector_b):
 def vector_mult(vector_a, vector_b):
     res = 0
     for x, y in zip(vector_a, vector_b):
-        res = x * y
+        res += x * y
     return res
 
 
 # each entry in weights is the connection to multiple neurons
 def neuron_mat_mult(weights_matrix, input_vector, layer_biases):
+    trans_mat = transpose_matrix(weights_matrix);
     return [
         neuron_vector_mult(weight, input_vector, bias)
-        for weight, bias in zip(weights_matrix, layer_biases)
+        for weight, bias in zip(trans_mat, layer_biases)
     ]
 
 
@@ -56,7 +57,7 @@ def neuron_vector_mult(weights, input_vector, bias):
 
 class Perceptron:
     def __init__(self, learning_rate=0.01, epoch=100):
-        self.input_2_hidden_w = [[0.1, 0.3], [0.2, 0.4]]
+        self.input_2_hidden_w = [[0.1, 0.2], [0.3, 0.4]]
         self.hidden_bias = [0, 0]
         self.hidden_2_output_w = [0.25, 0.45]
         self.output_bias = 0
@@ -74,23 +75,30 @@ class Perceptron:
             + self.output_bias
         )
         output_layer_activation = sigmoid(output_layer_output)
-        return {
+        res = {
             "hidden_layer_output": hidden_layer_output,
             "hidden_layer_activation": hidden_layer_activation,
             "output_layer_output": output_layer_output,
             "output_layer_activation": output_layer_activation,
         }
 
+        print("Forward pass result")
+        for key,val in res.items():
+            print(f"> {key}:{val}")
+
+        return res
+
     def train(self, training_data, labels):
         for iter in range(self.epoch):
             total_loss = 0
+            print(f"Iteration {iter}")
             for input_vector, expected_output in zip(training_data, labels):
                 forward_pass_res = self.forward_pass(input_vector)
-                # print(forward_pass_res)
                 output_activation = forward_pass_res["output_layer_activation"]
                 hidden_activation = forward_pass_res["hidden_layer_activation"]
 
                 output_loss = cross_entropy_loss(output_activation, expected_output)
+                # print(f"Ouput Loss: {output_loss}")
                 output_sigmoid_derv = sigmoid_derivative(
                     forward_pass_res["output_layer_output"]
                 )
@@ -136,18 +144,23 @@ class Perceptron:
                     )
                 ]
                 total_loss += output_loss
-            epoch_loss = output_loss/self.epoch
-            print(f"Output_loss: {epoch_loss} for iteration {iter}")
-            print(f"hidden_weights: {self.input_2_hidden_w}, hidden_bias: {self.hidden_bias}, output_weights: {self.hidden_2_output_w}, output: {self.output_bias}")
+            epoch_loss = total_loss/len(training_data)
+            print(f"Output_loss: {epoch_loss} ")
+            print(f"updated values: hidden_weights: {self.input_2_hidden_w}\nhidden_bias: {self.hidden_bias}\noutput_weights: {self.hidden_2_output_w}\noutput_bias: {self.output_bias}\n")
 
-
-if __name__ == "__main__":
+def full_training():
     training_data = [[0, 0], [1, 1], [0, 1], [1, 0]]
-    labels = [1, 1, 0, 0]
-    p = Perceptron(epoch=10000, learning_rate=0.1)
+    labels = [0, 0, 1, 1]
+    p = Perceptron(epoch=1000, learning_rate=0.1)
     p.train(training_data, labels)
     for input in training_data:
         output = p.forward_pass(input)["output_layer_activation"]
         print(f"{input} XOR = {output}")
+
+if __name__ == "__main__":
+    training_data = [[0,1]] 
+    labels = [1]
+    p = Perceptron(epoch=1, learning_rate=0.1)
+    p.train(training_data, labels)
     # print(neurons_mult(mat, vec, bias))
     # print(cross_entropy_loss(1000, 0))
