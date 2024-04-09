@@ -1,13 +1,15 @@
 import math
 
-'''
+"""
 There are a few issues with this that is worth keeping to learn from:
 - initializing all weights to zero leads to something called the symetry problem where each neuron are not specialized and focus on different features
 - transpose function not being called in forward pass
 - input_2_hidden matrix is misunderstood:
     - a row represents a neuron at the hidden layer i.e. all the connections from previous layer to current neuron
     - a col represents a neuron at the input laylr i.e. all connections from one neuron from previous layer to current layer
-'''
+- it is missing how the derivative of cross_entropy_loss is needed in order to calculate the gradient of ouput/hidden layer errors
+"""
+
 
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
@@ -131,7 +133,10 @@ class Perceptron:
                 self.ouput_bias -= self.learning_rate * output_bias_err_gradient
                 new_input_2_hidden_w = []
                 for row in self.input_2_hidden_w:
-                    new_row = [weight - (self.learning_rate * err) for weight, err in zip(row, input_2_hidden_err_gradient)]
+                    new_row = [
+                        weight - (self.learning_rate * err)
+                        for weight, err in zip(row, input_2_hidden_err_gradient)
+                    ]
                     new_input_2_hidden_w.append(new_row)
                 self.input_2_hidden_w = new_input_2_hidden_w
                 self.hidden_bias = [
@@ -141,7 +146,7 @@ class Perceptron:
                     )
                 ]
                 total_loss += output_loss
-            epoch_loss = output_loss/self.epoch
+            epoch_loss = output_loss / self.epoch
             print(f"Output_loss: {epoch_loss} for iteration {iter}")
 
 
