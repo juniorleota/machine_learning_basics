@@ -1,5 +1,8 @@
 import math
 
+'''
+So this implementation doesn't work but I left it here to hightligh how initializing everything to zero will lead to symmetry issue
+'''
 
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
@@ -143,7 +146,7 @@ if __name__ == "__main__":
     p = Perceptron(epoch=10000, learning_rate=0.1)
     p.train(training_data, labels)
     for input in training_data:
-        output = p.forward_pass(input)["ouput_layer_activation"]
+        output = p.forward_pass(input)["output_layer_activation"]
         print(f"{input} XOR = {output}")
     # print(neurons_mult(mat, vec, bias))
     # print(cross_entropy_loss(1000, 0))
