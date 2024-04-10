@@ -4,8 +4,13 @@ import math
 """
 The aim of this class is to have a simple multi-layer perceptron that can solve XOR problems.
 Whilst it is very basic and most of it can be reducted by 80% by using numpy, there is alot to
-learning from writting out the matrix and vector operations by hand and it allows for getting
+learn from writting out the matrix and vector operations by hand and it allows for getting
 the intuition of how all these vectors and matrices relate to the neurons themselves.
+
+So this uses:
+- cross entropy as loss function as I heard its good for binary classification problems
+- sigmoid as activation function, which should be next function after step function
+-
 """
 
 
@@ -86,6 +91,8 @@ def vect_mult_mat(v_col, v_row):
 class Perceptron:
     def __init__(self, learning_rate=0.01, epoch=100):
         # todo use random generated values for weights for now we will use static values for ease of debugging
+        # each row represent one neuron in hidden layer
+        # each col reprents one elem in hidden layer
         self.input_2_hidden_weights = [[0.1, 0.2], [0.3, 0.4]]
         self.hidden_bias = [0, 0]
         self.hidden_2_output_weights = [0.25, 0.45]
