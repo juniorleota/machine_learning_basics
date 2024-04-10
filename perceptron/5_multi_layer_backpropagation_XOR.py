@@ -1,6 +1,14 @@
 import math
 
 
+"""
+The aim of this class is to have a simple multi-layer perceptron that can solve XOR problems.
+Whilst it is very basic and most of it can be reducted by 80% by using numpy, there is alot to
+learning from writting out the matrix and vector operations by hand and it allows for getting
+the intuition of how all these vectors and matrices relate to the neurons themselves.
+"""
+
+
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
