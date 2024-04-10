@@ -2,3 +2,4 @@
 venv/
 answers/
 .vscode/
+__pycache__/
