@@ -77,6 +77,7 @@ def vect_mult_mat(v_col, v_row):
 
 class Perceptron:
     def __init__(self, learning_rate=0.01, epoch=100):
+        # todo use random generated values for weights for now we will use static values for ease of debugging
         self.input_2_hidden_w = [[0.1, 0.2], [0.3, 0.4]]
         self.hidden_bias = [0, 0]
         self.hidden_2_output_w = [0.25, 0.45]
@@ -103,8 +104,8 @@ class Perceptron:
             "output_layer_activation": output_layer_activation,
         }
 
-        #print("Forward pass result")
-        #for key, val in res.items():
+        # print("Forward pass result")
+        # for key, val in res.items():
         #    print(f"> {key}:{val}")
 
         return res
@@ -185,9 +186,6 @@ class Perceptron:
             epoch_loss = total_loss / len(training_data)
             if iter % 100 == 0:
                 print(f"Output_loss: {epoch_loss} for iter {iter}")
-            # print(
-            #    f"updated values:\nhidden_weights: {self.input_2_hidden_w}\nhidden_bias: {self.hidden_bias}\noutput_weights: {self.hidden_2_output_w}\noutput_bias: {self.output_bias}\n"
-            # )
 
 
 def full_training():
