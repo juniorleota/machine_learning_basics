@@ -103,9 +103,9 @@ class Perceptron:
             "output_layer_activation": output_layer_activation,
         }
 
-        print("Forward pass result")
-        for key, val in res.items():
-            print(f"> {key}:{val}")
+        #print("Forward pass result")
+        #for key, val in res.items():
+        #    print(f"> {key}:{val}")
 
         return res
 
@@ -159,7 +159,7 @@ class Perceptron:
     def train(self, training_data, labels):
         for iter in range(self.epoch):
             total_loss = 0
-            print(f"Iteration {iter}")
+            # print(f"Iteration {iter}")
             for input_vector, expected_output in zip(training_data, labels):
                 forward_pass_res = self.forward_pass(input_vector)
                 (
@@ -173,26 +173,27 @@ class Perceptron:
                     self.hidden_2_output_w, vector_scale(derv_hidden_2_output_w, lr)
                 )
                 self.output_bias -= lr * derv_output_bias
-                # self.input_2_hidden_w = []
-                print(f"di2hw: {derv_input_2_hidden_w}")
+                self.input_2_hidden_w = mat_sub(
+                    self.input_2_hidden_w, matrix_scale(derv_input_2_hidden_w, lr)
+                )
                 self.hidden_bias = vector_sub(
                     self.hidden_bias, vector_scale(derv_hidden_bias, lr)
                 )
-
                 output_activation = forward_pass_res["output_layer_activation"]
-                total_loss += cross_entropy_loss(output_activation, expected_output)
-
+                iter_loss = cross_entropy_loss(output_activation, expected_output)
+                total_loss += iter_loss
             epoch_loss = total_loss / len(training_data)
-            print(f"Output_loss: {epoch_loss} ")
-            print(
-                f"updated values:\nhidden_weights: {self.input_2_hidden_w}\nhidden_bias: {self.hidden_bias}\noutput_weights: {self.hidden_2_output_w}\noutput_bias: {self.output_bias}\n"
-            )
+            if iter % 100 == 0:
+                print(f"Output_loss: {epoch_loss} for iter {iter}")
+            # print(
+            #    f"updated values:\nhidden_weights: {self.input_2_hidden_w}\nhidden_bias: {self.hidden_bias}\noutput_weights: {self.hidden_2_output_w}\noutput_bias: {self.output_bias}\n"
+            # )
 
 
 def full_training():
     training_data = [[0, 0], [1, 1], [0, 1], [1, 0]]
     labels = [0, 0, 1, 1]
-    p = Perceptron(epoch=1000, learning_rate=0.1)
+    p = Perceptron(epoch=100000, learning_rate=0.1)
     p.train(training_data, labels)
     for input in training_data:
         output = p.forward_pass(input)["output_layer_activation"]
@@ -207,10 +208,11 @@ def single_iter_training():
 
 
 if __name__ == "__main__":
-    print(matrix_scale([[1, 2], [3, 4]], 2))
-    col = [1, 2]
-    row = [2, 2]
-    print(vect_mult_mat(col, row))
+    full_training()
+    # print(matrix_scale([[1, 2], [3, 4]], 2))
+    # col = [1, 2]
+    # row = [2, 2]
+    # print(vect_mult_mat(col, row))
     # single_iter_training()
     # print(neurons_mult(mat, vec, bias))
     # print(cross_entropy_loss(1000, 0))
