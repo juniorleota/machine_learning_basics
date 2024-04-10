@@ -209,10 +209,3 @@ def single_iter_training():
 
 if __name__ == "__main__":
     full_training()
-    # print(matrix_scale([[1, 2], [3, 4]], 2))
-    # col = [1, 2]
-    # row = [2, 2]
-    # print(vect_mult_mat(col, row))
-    # single_iter_training()
-    # print(neurons_mult(mat, vec, bias))
-    # print(cross_entropy_loss(1000, 0))
