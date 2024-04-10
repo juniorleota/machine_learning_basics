@@ -1,7 +1,7 @@
 import math
 
 """
-There are a few issues with this that is worth keeping to learn from:
+This code doesnt work, but as a first attempt it brings forth alot of mistakes that is worth learning from:
 - initializing all weights to zero leads to something called the symetry problem where each neuron are not specialized and focus on different features
 - transpose function not being called in forward pass
 - input_2_hidden matrix is misunderstood:
