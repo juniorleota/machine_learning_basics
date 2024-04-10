@@ -78,9 +78,9 @@ def vect_mult_mat(v_col, v_row):
 class Perceptron:
     def __init__(self, learning_rate=0.01, epoch=100):
         # todo use random generated values for weights for now we will use static values for ease of debugging
-        self.input_2_hidden_w = [[0.1, 0.2], [0.3, 0.4]]
+        self.input_2_hidden_weights = [[0.1, 0.2], [0.3, 0.4]]
         self.hidden_bias = [0, 0]
-        self.hidden_2_output_w = [0.25, 0.45]
+        self.hidden_2_output_weights = [0.25, 0.45]
         self.output_bias = 0
         self.learning_rate = learning_rate
         self.epoch = epoch
@@ -88,12 +88,12 @@ class Perceptron:
     def forward_pass(self, input_vector):
         hidden_layer_output = [
             vector_mult(neuron_weights, input_vector) + bias
-            for neuron_weights, bias in zip(self.input_2_hidden_w, self.hidden_bias)
+            for neuron_weights, bias in zip(self.input_2_hidden_weights, self.hidden_bias)
         ]
         hidden_layer_activation = [sigmoid(output) for output in hidden_layer_output]
         # no need to transpose since there is only one output neuron
         output_layer_output = (
-            vector_mult(self.hidden_2_output_w, hidden_layer_activation)
+            vector_mult(self.hidden_2_output_weights, hidden_layer_activation)
             + self.output_bias
         )
         output_layer_activation = sigmoid(output_layer_output)
@@ -117,18 +117,18 @@ class Perceptron:
     """
 
     def backward_pass(self, input_vector, expected_ouput, forward_pass_res):
-        output_layer_z = forward_pass_res["output_layer_output"]
-        output_activation = forward_pass_res["output_layer_activation"]
+        output_layer_output = forward_pass_res["output_layer_output"]
+        output_layer_activation = forward_pass_res["output_layer_activation"]
         hidden_layer_output = forward_pass_res["hidden_layer_output"]
         hidden_layer_activation = forward_pass_res["hidden_layer_activation"]
 
         # Derive output layer
         derv_output_activation = cross_entropy_loss_derivative(
-            output_activation, expected_ouput
+            output_layer_activation, expected_ouput
         )
-        derv_output_z = derv_output_activation * sigmoid_derivative(output_layer_z)
+        derv_output_z = derv_output_activation * sigmoid_derivative(output_layer_output)
         # todo this needs to be a matrix so that it can be subtracted later
-        derv_hidden_2_output_w = [
+        derv_hidden_2_output_weights = [
             derv_output_z * hidden_neuron_activation
             for hidden_neuron_activation in hidden_layer_activation
         ]
@@ -136,10 +136,10 @@ class Perceptron:
 
         # derive hidden
         # we go backwards here
-        # (hidden_bias | input_2_hiddden_w | input_activation) -> hidden_ouput ->
-        # (hidden_activation | hidden_2_ouput_w | output_bias) -> ouput_z -> output_activation
+        # (hidden_bias | input_2_hiddden_weights | input_activation) -> hidden_ouput ->
+        # (hidden_activation | hidden_2_ouput_weights | output_bias) -> ouput_z -> output_activation
         derv_hidden_activation = [
-            neuron_w * derv_output_z for neuron_w in self.hidden_2_output_w
+            neuron_weights * derv_output_z for neuron_weights in self.hidden_2_output_weights
         ]
         derv_hidden_output = [
             hidden_neuron_a * sigmoid_derivative(hidden_neuron_z)
@@ -147,13 +147,13 @@ class Perceptron:
                 hidden_layer_output, derv_hidden_activation
             )
         ]
-        derv_input_2_hidden_w = vect_mult_mat(input_vector, derv_hidden_output)
+        derv_input_2_hidden_weights = vect_mult_mat(input_vector, derv_hidden_output)
         derv_hidden_bias = derv_hidden_output
 
         return (
-            derv_hidden_2_output_w,
+            derv_hidden_2_output_weights,
             derv_output_bias,
-            derv_input_2_hidden_w,
+            derv_input_2_hidden_weights,
             derv_hidden_bias,
         )
 
@@ -164,18 +164,18 @@ class Perceptron:
             for input_vector, expected_output in zip(training_data, labels):
                 forward_pass_res = self.forward_pass(input_vector)
                 (
-                    derv_hidden_2_output_w,
+                    derv_hidden_2_output_weights,
                     derv_output_bias,
-                    derv_input_2_hidden_w,
+                    derv_input_2_hidden_weights,
                     derv_hidden_bias,
                 ) = self.backward_pass(input_vector, expected_output, forward_pass_res)
                 lr = self.learning_rate
-                self.hidden_2_output_w = vector_sub(
-                    self.hidden_2_output_w, vector_scale(derv_hidden_2_output_w, lr)
+                self.hidden_2_output_weights = vector_sub(
+                    self.hidden_2_output_weights, vector_scale(derv_hidden_2_output_weights, lr)
                 )
                 self.output_bias -= lr * derv_output_bias
-                self.input_2_hidden_w = mat_sub(
-                    self.input_2_hidden_w, matrix_scale(derv_input_2_hidden_w, lr)
+                self.input_2_hidden_weights = mat_sub(
+                    self.input_2_hidden_weights, matrix_scale(derv_input_2_hidden_weights, lr)
                 )
                 self.hidden_bias = vector_sub(
                     self.hidden_bias, vector_scale(derv_hidden_bias, lr)
