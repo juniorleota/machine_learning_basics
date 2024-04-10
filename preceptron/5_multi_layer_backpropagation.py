@@ -1,10 +1,5 @@
 import math
 
-"""
-So this implementation doesn't work but I left it here to hightligh how initializing everything to zero will lead to symmetry issue
-"""
-
-
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
@@ -13,13 +8,7 @@ def sigmoid_derivative(x):
     return sigmoid(x) * (1 - sigmoid(x))
 
 
-def transpose_matrix(mat):
-    res = []
-    for row in zip(*mat):
-        res.append(list(row))
-    return res
-
-
+# This function is only used for analysis, only its derivative is used for analysis
 def cross_entropy_loss(predicted_output, expected_output):
     epsilon = 1e-10
     # this ensures that there is no log(0), so the first filter is to ensure that this is not exactly 1 since we have 1 - predicted_output in formula
@@ -50,19 +39,6 @@ def vector_mult(vector_a, vector_b):
     for x, y in zip(vector_a, vector_b):
         res += x * y
     return res
-
-
-# each entry in weights is the connection to multiple neurons
-def neuron_mat_mult(weights_matrix, input_vector, layer_biases):
-    trans_mat = transpose_matrix(weights_matrix)
-    return [
-        neuron_vector_mult(weight, input_vector, bias)
-        for weight, bias in zip(trans_mat, layer_biases)
-    ]
-
-
-def neuron_vector_mult(weights, input_vector, bias):
-    return vector_mult(weights, input_vector) + bias
 
 
 class Perceptron:
