@@ -1,5 +1,6 @@
 import math
 
+
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
@@ -28,16 +29,49 @@ def cross_entropy_loss_derivative(y_predicted, y_expected):
 def vector_add(vector_a, vector_b):
     return [x + y for x, y in zip(vector_a, vector_b)]
 
+
 def vector_scale(vec, scalar):
-    return [x*scalar for x in vec]
+    return [x * scalar for x in vec]
+
 
 def vector_sub(vec_a, vec_b):
-    return [x - y for x,y in zip(vec_a, vec_b)]
+    return [x - y for x, y in zip(vec_a, vec_b)]
+
 
 def vector_mult(vector_a, vector_b):
     res = 0
     for x, y in zip(vector_a, vector_b):
         res += x * y
+    return res
+
+
+def mat_sub(mat_a, mat_b):
+    new_mat = []
+    for row_a, row_b in zip(mat_a, mat_b):
+        new_row = []
+        for col_a, col_b in zip(row_a, row_b):
+            new_row.append(col_a - col_b)
+        new_mat.append(new_row)
+    return new_mat
+
+
+def matrix_scale(mat, scalar):
+    new_mat = []
+    for row in mat:
+        new_row = []
+        for col in row:
+            new_row.append(col * scalar)
+        new_mat.append(new_row)
+    return new_mat
+
+
+def vect_mult_mat(v_col, v_row):
+    res = []
+    for col_elem in v_col:
+        res_row = []
+        for row_elem in v_row:
+            res_row.append(col_elem * row_elem)
+        res.append(res_row)
     return res
 
 
@@ -112,10 +146,7 @@ class Perceptron:
                 hidden_layer_output, derv_hidden_activation
             )
         ]
-        derv_input_2_hidden_w = [
-            input * neuron_derv_z
-            for input, neuron_derv_z in zip(input_vector, derv_hidden_output)
-        ]
+        derv_input_2_hidden_w = vect_mult_mat(input_vector, derv_hidden_output)
         derv_hidden_bias = derv_hidden_output
 
         return (
@@ -138,11 +169,15 @@ class Perceptron:
                     derv_hidden_bias,
                 ) = self.backward_pass(input_vector, expected_output, forward_pass_res)
                 lr = self.learning_rate
-                self.hidden_2_output_w = vector_sub(self.hidden_2_output_w, vector_scale(derv_hidden_2_output_w, lr))
+                self.hidden_2_output_w = vector_sub(
+                    self.hidden_2_output_w, vector_scale(derv_hidden_2_output_w, lr)
+                )
                 self.output_bias -= lr * derv_output_bias
                 # self.input_2_hidden_w = []
                 print(f"di2hw: {derv_input_2_hidden_w}")
-                self.hidden_bias = vector_sub(self.hidden_bias, vector_scale(derv_hidden_bias, lr))
+                self.hidden_bias = vector_sub(
+                    self.hidden_bias, vector_scale(derv_hidden_bias, lr)
+                )
 
                 output_activation = forward_pass_res["output_layer_activation"]
                 total_loss += cross_entropy_loss(output_activation, expected_output)
@@ -152,6 +187,7 @@ class Perceptron:
             print(
                 f"updated values:\nhidden_weights: {self.input_2_hidden_w}\nhidden_bias: {self.hidden_bias}\noutput_weights: {self.hidden_2_output_w}\noutput_bias: {self.output_bias}\n"
             )
+
 
 def full_training():
     training_data = [[0, 0], [1, 1], [0, 1], [1, 0]]
@@ -171,6 +207,10 @@ def single_iter_training():
 
 
 if __name__ == "__main__":
-    single_iter_training()
+    print(matrix_scale([[1, 2], [3, 4]], 2))
+    col = [1, 2]
+    row = [2, 2]
+    print(vect_mult_mat(col, row))
+    # single_iter_training()
     # print(neurons_mult(mat, vec, bias))
     # print(cross_entropy_loss(1000, 0))
