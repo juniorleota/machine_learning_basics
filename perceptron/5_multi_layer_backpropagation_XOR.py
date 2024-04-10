@@ -88,7 +88,9 @@ class Perceptron:
     def forward_pass(self, input_vector):
         hidden_layer_output = [
             vector_mult(neuron_weights, input_vector) + bias
-            for neuron_weights, bias in zip(self.input_2_hidden_weights, self.hidden_bias)
+            for neuron_weights, bias in zip(
+                self.input_2_hidden_weights, self.hidden_bias
+            )
         ]
         hidden_layer_activation = [sigmoid(output) for output in hidden_layer_output]
         # no need to transpose since there is only one output neuron
@@ -139,7 +141,8 @@ class Perceptron:
         # (hidden_bias | input_2_hiddden_weights | input_activation) -> hidden_ouput ->
         # (hidden_activation | hidden_2_ouput_weights | output_bias) -> ouput_z -> output_activation
         derv_hidden_activation = [
-            neuron_weights * derv_output_z for neuron_weights in self.hidden_2_output_weights
+            neuron_weights * derv_output_z
+            for neuron_weights in self.hidden_2_output_weights
         ]
         derv_hidden_output = [
             hidden_neuron_a * sigmoid_derivative(hidden_neuron_z)
@@ -171,11 +174,13 @@ class Perceptron:
                 ) = self.backward_pass(input_vector, expected_output, forward_pass_res)
                 lr = self.learning_rate
                 self.hidden_2_output_weights = vector_sub(
-                    self.hidden_2_output_weights, vector_scale(derv_hidden_2_output_weights, lr)
+                    self.hidden_2_output_weights,
+                    vector_scale(derv_hidden_2_output_weights, lr),
                 )
                 self.output_bias -= lr * derv_output_bias
                 self.input_2_hidden_weights = mat_sub(
-                    self.input_2_hidden_weights, matrix_scale(derv_input_2_hidden_weights, lr)
+                    self.input_2_hidden_weights,
+                    matrix_scale(derv_input_2_hidden_weights, lr),
                 )
                 self.hidden_bias = vector_sub(
                     self.hidden_bias, vector_scale(derv_hidden_bias, lr)
