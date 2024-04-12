@@ -1,5 +1,9 @@
 """
 This class will explore using np to simplify alot of the calculations done for MLP.
+Note:
+- np forw pass will take training data as array and not as one input_vector
+so its more matrix first
+- the order of matrix multiplication matters so you need to aware of that
 """
 
 import numpy as np
@@ -13,21 +17,17 @@ def sigmoid_d(x):
     return sigmoid(x) * (1 - sigmoid(x))
 
 
+# this doesnt really matter an only for analysis
 def cross_entropy_loss(predicted_output, expected_output):
-    epsilon = 1e-10
-    # this ensures that there is no log(0), so the first filter is to ensure that this is not exactly 1 since we have 1 - predicted_output in formula
-    predicted_output_clipped = min(predicted_output, 1 - epsilon)
-    # this ensures that pred_output is never 0
-    predicted_output_clipped = max(predicted_output_clipped, epsilon)
-    return -1 * (
-        expected_output * np.log(predicted_output_clipped)
-        + (1 - expected_output) * np.log(1 - predicted_output_clipped)
+    return -np.mean(
+        expected_output * np.log(predicted_output)
+        + (1 - expected_output) * np.log(1 - predicted_output)
     )
-    pass
-
 
 def cross_entropy_loss_derivative(predicted_output, expected_output):
-    return -(expected_output / predicted_output) + ((1 - expected_output) / (1 - predicted_output))
+    return -(expected_output / predicted_output) + (
+        (1 - expected_output) / (1 - predicted_output)
+    )
 
 
 class MLP:
@@ -41,8 +41,8 @@ class MLP:
         self.w_hidden_to_output = np.array([0.25, 0.45])
         self.b_output = np.zeros(1)
 
-    def forw_pass(self, input_vector):
-        hidden_output = np.dot(self.w_input_to_hidden, input_vector) + self.b_hidden
+    def forw_pass(self, training_data):
+        hidden_output = np.dot(training_data, self.w_input_to_hidden) + self.b_hidden
         hidden_activation = sigmoid(hidden_output)
         output_output = (
             np.dot(hidden_activation, self.w_hidden_to_output) + self.b_output
@@ -52,37 +52,71 @@ class MLP:
 
     def back_pass(
         self,
-        input_vector,
-        expected_output,
+        training_data,
+        labels,
         hidden_output,
         hidden_activation,
         output_output,
         output_activation,
     ):
-        '''
+        """
         There are 2 pathsway for each layer:
         - change in loss for change in weight
         - change in loss for change in bias
-        Now this is more relevant in last layer but we can use chain rule to connect it all
-        the way through
-        '''
+        The pass is : Cost <- Activation <- LinearOutput <- (Weights | Bias | Activation of Prev Layer)
+        """
         # change in loss wrt ouput activation
-        # change in ouput activation wrt output output 
-        # change in ouput output wrt hidden2ouput weights
-        # change in ouput output wrt output bias 
-        # change in ouput output wrt hidden activation 
-        # change in hidden activation wrt hidden ouput
-        # change in hidden output wrt to input2hidden weights
-        # change in hidden output wrt to hidden bias
-        pass
+        dl_dao = cross_entropy_loss_derivative(output_activation, labels)
+        # change in ouput activation wrt output output
+        dao_dzo = dl_dao * sigmoid_d(output_output)
+        # change in ouput output wrt hidden2ouput weights i.e the derivative of a(l-l)*w + b = a(l-1)
+        # note: the order here matters
+        dzo_dwh2o = np.dot(hidden_activation.T, dao_dzo)
+        # change in ouput output wrt output bias, the derivative is 1
+        dzo_dbo = (
+            dao_dzo * 1
+        )  # need to figure out why this is usually np.sum(dZ2, axis=0)
+        # chagne in ouput_output wrt to activation
+        # z = w*a(l-1) + b => dz/da = w * a(l-1)^-1 = w
+        dzo_dah = np.dot(dao_dzo,self.w_input_to_hidden.T)
+        # change in hidden activation wrt to hidden output 
+        dah_dzh = np.dot(dzo_dah, sigmoid_d(hidden_output))
+        # change in hidden output wrt to hidden weights 
+        # z = w * Input + b
+        # dz/dw = Input
+        dzh_dwi2h = np.dot(X.T, dah_dzh)
+        # change in hidden output wrt to hidden bias 
+        # z = w * I + b
+        # dz/db = 1
+        dzh_dbh = dah_dzh
+        return dzo_dwh2o, dzo_dbo, dzh_dwi2h, dzh_dbh
 
     def train(self, training_data, labels):
-        pass
+        for iter in range(self.epochs):
+            hidden_output, hidden_activation, output_output, output_activation = (
+                self.forw_pass(training_data)
+            )
+            d_w_hidden_2_output, d_b_output, d_w_input_2_hidden, d_b_hidden = self.back_pass(
+                training_data,
+                labels,
+                hidden_output,
+                hidden_activation,
+                output_output,
+                output_activation,
+            )
+            self.w_hidden_to_output -= self.lr * d_w_hidden_2_output
+            self.b_output -= self.lr * d_b_output
+            self.w_input_to_hidden -= self.lr * d_w_input_2_hidden
+            self.b_hidden -= self.lr * d_b_hidden
+            if (iter % 100):
+                loss = cross_entropy_loss(output_activation, labels)
+                print(f"Loss: {loss} for iteration {iter}")
 
 
 if __name__ == "__main__":
     training_data = np.array([[0, 0], [1, 1], [0, 1], [1, 0]])
     labels = np.array([0, 0, 1, 1])
-    mlp = MLP()
-    res = mlp.forw_pass(np.array([1, 1]))
-    print(res)
+    mlp = MLP(epochs=1000)
+    mlp.train(training_data, labels)
+    print(mlp.forw_pass(np.array([0,1])))
+
