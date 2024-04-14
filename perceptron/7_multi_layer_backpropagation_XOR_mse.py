@@ -17,9 +17,6 @@ def sigmoid_d(x):
 
 def mse(predicted_output, expected_output):
     return ((expected_output- predicted_output) ** 2).mean()
-    #subtraction = expected_output-predicted_output
-    #raised = np.power(subtraction, [2])
-    #return np.mean(raised)
 
 # this is change in loss wrt to predicted_output
 def mse_d(predicted_output, expected_output):
