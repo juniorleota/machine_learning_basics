@@ -30,5 +30,13 @@ def spec_functions():
     log_10 = np.log10(10)
     pass
 
+def powers():
+    vec = np.array([[1,2,3], [1,2,3]])
+    raised_using_np = np.power(vec, [2])
+    print(raised_using_np)
+    raised = vec ** 2
+    print(raised)
+
+
 if __name__ == "__main__":
-    rand_and_zero_mats()
+    powers()
