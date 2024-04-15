@@ -6,7 +6,7 @@ keep each data to be per input vector and not collapsed.
 """
 
 import numpy as np
-
+from utils import loss_viz as lviz
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -39,6 +39,7 @@ class MLP:
         # row is output neuron, col is hidden neuron
         self.w_hidden_to_output = np.array([[0.25], [0.45]])
         self.b_output = np.zeros(1)
+        self.loss_viz = lviz.LossViz()
 
     def forw_pass(self, training_data):
         hidden_output = np.dot(training_data, self.w_input_to_hidden) + self.b_hidden
@@ -90,6 +91,7 @@ class MLP:
         return dzo_dwh2o, dzo_dbo, dzh_dwi2h, dzh_dbh
 
     def train(self, training_data, labels):
+        loss_data = []
         for iter in range(self.epochs):
             hidden_output, hidden_activation, output_output, output_activation = (
                 self.forw_pass(training_data)
@@ -114,13 +116,15 @@ class MLP:
                 break
             if iter % 100 == 0:
                 print(f"Loss: {loss} for iteration {iter}")
+                loss_data.append([iter, loss])
+        self.loss_viz.show(loss_data)
 
 
 if __name__ == "__main__":
     training_data = np.array([[0, 0], [1, 1], [0, 1], [1, 0]])
     labels = np.array([[0], [0], [1], [1]])
     epoch = 100000
-    mlp = MLP(epochs=epoch, learning_rate=0.2)
+    mlp = MLP(epochs=epoch, learning_rate=0.05)
     mlp.train(training_data, labels)
     for input in training_data:
         res = mlp.forw_pass(np.array([input]))[3]
