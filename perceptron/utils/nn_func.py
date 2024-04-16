@@ -29,3 +29,12 @@ def mse(predicted_output, expected_output):
 
 def mse_d(predicted_output, expected_output):
     return -2 * (expected_output - predicted_output)
+
+
+def relu(x):
+    # if x > 0 then use x value
+    return x * (x>0)
+
+def relu_d(x):
+    # if x > 0 then use 1 else use 0
+    return 1 * (x > 0)
