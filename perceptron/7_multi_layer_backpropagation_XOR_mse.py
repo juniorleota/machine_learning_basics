@@ -3,6 +3,14 @@ This is just simple replacement of the loss function cross entropy to much simpl
 Note:
 - when doing the derivative of loss error you should ignore the summation function since you want to 
 keep each data to be per input vector and not collapsed. 
+- so the main difference between mse and cross entropy is how they deal with error,
+with MSE expectation-ouput close to 1 (i.e very incorrect) the square will increase the gradient for it
+with Cross Entropy it measures the difference between 2 distributions (i.e 0 or 1 in binary classification)
+if it gets something wrong e.g. -1log(0) this is close to infinity so the gradient to change it is high
+    - -1 * (y_true * log(y_pred) + (1-y_true * log(1-y_pred)))
+    - the negative multiplication is to take -infinity to +ve infinity for log curve
+    - the first term is to deal for 1 as the expecet output
+    - the secon formula is for when 0 is the expected output (i.e convert it to 1)
 """
 
 import numpy as np
@@ -33,10 +41,10 @@ class MLP:
     def __init__(self, epochs=1000, learning_rate=0.1):
         self.epochs = epochs
         self.lr = learning_rate
-        # row is hidden neuron, col is input
+        # col is hidden neuron, row is input
         self.w_input_to_hidden = np.array([[0.1, 0.2], [0.3, 0.4]])
         self.b_hidden = np.zeros(2)
-        # row is output neuron, col is hidden neuron
+        # col is output neuron, row is hidden neuron
         self.w_hidden_to_output = np.array([[0.25], [0.45]])
         self.b_output = np.zeros(1)
         self.loss_viz = lviz.LossViz()
