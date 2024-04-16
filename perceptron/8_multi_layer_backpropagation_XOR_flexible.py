@@ -10,16 +10,25 @@ from utils import nn_func as nnf
 
 
 class MLP:
-    def __init__(self, epochs=1000, learning_rate=0.1, show_grad = False):
+    def __init__(
+        self,
+        epochs=1000,
+        learning_rate=0.1,
+        input_features_size=2,
+        hidden_neuron_size=4,
+        show_grad=False,
+    ):
         self.epochs = epochs
         self.lr = learning_rate
         # col is hidden neuron, row is input connection to neuron
-        hidden_neurons_size = 4
-        input_features_size = 2
-        self.w_input_to_hidden = np.random.uniform(size=(input_features_size, hidden_neurons_size))
-        self.b_hidden = np.zeros(hidden_neurons_size)
+        self.w_input_to_hidden = np.random.uniform(
+            size=(input_features_size, hidden_neuron_size)
+        )
+        self.b_hidden = np.zeros(hidden_neuron_size)
         output_neurons_size = 1
-        self.w_hidden_to_output = np.random.uniform(size=(hidden_neurons_size, output_neurons_size))
+        self.w_hidden_to_output = np.random.uniform(
+            size=(hidden_neuron_size, output_neurons_size)
+        )
         self.b_output = np.zeros(output_neurons_size)
         self.loss_viz = lviz.LossViz()
         self.show_grad = show_grad
@@ -73,13 +82,15 @@ class MLP:
             self.w_input_to_hidden -= self.lr * d_w_input_2_hidden
             self.b_hidden -= self.lr * d_b_hidden
             loss = nnf.mse(output_activation, labels)
-            if (loss < 0.01):
-                print(f"loss is already at 99.999%, so stopping training at iteration {iter}")
+            if loss < 0.01:
+                print(
+                    f"loss is already at 99.999%, so stopping training at iteration {iter}"
+                )
                 break
             if iter % 100 == 0:
                 print(f"Loss: {loss} for iteration {iter}")
                 loss_data.append([iter, loss])
-        if (self.show_grad):
+        if self.show_grad:
             self.loss_viz.show(loss_data)
 
 
