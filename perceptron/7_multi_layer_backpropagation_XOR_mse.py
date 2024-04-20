@@ -14,7 +14,7 @@ if it gets something wrong e.g. -1log(0) this is close to infinity so the gradie
 """
 
 import numpy as np
-from utils import loss_viz as lviz
+from perceptron.putils import loss_viz as lviz
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))

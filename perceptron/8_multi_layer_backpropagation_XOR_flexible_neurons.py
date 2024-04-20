@@ -5,8 +5,8 @@ keep each data to be per input vector and not collapsed.
 """
 
 import numpy as np
-from utils import loss_viz as lviz
-from utils import nn_func as nnf
+from perceptron.putils import loss_viz as lviz
+from perceptron.putils import nn_func as nnf
 
 
 class MLP:

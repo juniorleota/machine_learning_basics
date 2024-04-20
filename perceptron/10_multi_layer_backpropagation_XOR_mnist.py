@@ -1,6 +1,10 @@
 """
+Goal:
+- convert MLP implementation to classify mnist database
+    - this will require alot of refactoring to allow for 28x28 images
+    - and have multiple output classification
 Note:
-- * and .dot are diffent, one is hadamard which require same matrix size and the other requires specic row_size_m1 == col_size_m2
+
 """
 
 import numpy as np
@@ -13,7 +17,7 @@ class MLP:
         self,
         epochs=1000,
         learning_rate=0.1,
-        input_features_size=2,
+        input_features_size=3,
         hidden_neuron_size=4,
         show_grad=False,
     ):
@@ -94,7 +98,7 @@ class MLP:
 
 
 if __name__ == "__main__":
-    training_data = np.array([[0, 0], [1, 1], [0, 1], [1, 0]])
+    training_data = np.array([[0, 0, 0], [1, 1, 1], [1, 0, 1], [0, 1, 0]])
     labels = np.array([[0], [0], [1], [1]])
     np.min
     epoch = 100000
@@ -103,4 +107,3 @@ if __name__ == "__main__":
     for input in training_data:
         res = mlp.forw_pass(np.array([input]))[3]
         print(f"{input} = {res}")
-        
