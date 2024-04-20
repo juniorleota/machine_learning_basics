@@ -4,8 +4,8 @@ Note:
 """
 
 import numpy as np
-from perceptron.putils import loss_viz as lviz
-from perceptron.putils import nn_func as nnf
+from putils import loss_viz as lviz
+from putils import nn_func as nnf
 
 
 class MLP:
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     labels = np.array([[0], [0], [1], [1]])
     np.min
     epoch = 100000
-    mlp = MLP(epochs=epoch, learning_rate=0.05, show_grad=True)
+    mlp = MLP(epochs=epoch, learning_rate=0.05, show_grad=False)
     mlp.train(training_data, labels)
     for input in training_data:
         res = mlp.forw_pass(np.array([input]))[3]

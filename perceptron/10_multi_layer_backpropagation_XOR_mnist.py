@@ -8,8 +8,8 @@ Note:
 """
 
 import numpy as np
-from perceptron.putils import loss_viz as lviz
-from perceptron.putils import nn_func as nnf
+from putils import loss_viz as lviz
+from putils import nn_func as nnf
 
 
 class MLP:
