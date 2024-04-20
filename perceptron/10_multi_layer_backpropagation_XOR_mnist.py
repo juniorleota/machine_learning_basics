@@ -8,6 +8,7 @@ Note:
 """
 
 import numpy as np
+from tensorflow.keras.datasets import mnist
 from putils import loss_viz as lviz
 from putils import nn_func as nnf
 
@@ -19,6 +20,7 @@ class MLP:
         learning_rate=0.1,
         input_features_size=3,
         hidden_neuron_size=4,
+        ouput_neuron_size=1,
         show_grad=False,
     ):
         self.epochs = epochs
@@ -42,6 +44,7 @@ class MLP:
         output_output = (
             np.dot(hidden_activation, self.w_hidden_to_output) + self.b_output
         )
+        # todo this should use general cross entropy
         output_activation = nnf.sigmoid(output_output)
         return (hidden_output, hidden_activation, output_output, output_activation)
 
@@ -98,12 +101,11 @@ class MLP:
 
 
 if __name__ == "__main__":
-    training_data = np.array([[0, 0, 0], [1, 1, 1], [1, 0, 1], [0, 1, 0]])
-    labels = np.array([[0], [0], [1], [1]])
-    np.min
-    epoch = 100000
-    mlp = MLP(epochs=epoch, learning_rate=0.05, show_grad=True)
-    mlp.train(training_data, labels)
-    for input in training_data:
-        res = mlp.forw_pass(np.array([input]))[3]
-        print(f"{input} = {res}")
+    (training_data_mat, training_label), (test_data, test_labels) = mnist.load_data()
+    training_data_1d = [data.flatten() for data in training_data_mat]
+    epoch = 1
+    mlp = MLP(epochs=epoch, learning_rate=0.05, input_features_size=784, hidden_neuron_size=784, ouput_neuron_size=10)
+    mlp.train(training_data_1d, training_label)
+    #for input in training_data:
+    #    res = mlp.forw_pass(np.array([input]))[3]
+    #    print(f"{input} = {res}")
