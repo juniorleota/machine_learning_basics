@@ -8,7 +8,7 @@ Note:
 """
 
 import numpy as np
-from tensorflow.keras.datasets import mnist
+from tensorflow.keras.datasets import mnist  # type: ignore
 from putils import loss_viz as lviz
 from putils import nn_func as nnf
 
@@ -104,8 +104,14 @@ if __name__ == "__main__":
     (training_data_mat, training_label), (test_data, test_labels) = mnist.load_data()
     training_data_1d = [data.flatten() for data in training_data_mat]
     epoch = 1
-    mlp = MLP(epochs=epoch, learning_rate=0.05, input_features_size=784, hidden_neuron_size=784, ouput_neuron_size=10)
+    mlp = MLP(
+        epochs=epoch,
+        learning_rate=0.05,
+        input_features_size=784,
+        hidden_neuron_size=784,
+        ouput_neuron_size=10,
+    )
     mlp.train(training_data_1d, training_label)
-    #for input in training_data:
+    # for input in training_data:
     #    res = mlp.forw_pass(np.array([input]))[3]
     #    print(f"{input} = {res}")
